@@ -1,4 +1,6 @@
 import scapy.all as scapy
+from scapy.layers.l2 import ARP, getmacbyip
+from scapy.layers.inet import IP, TCP, UDP
 from scapy.layers.http import HTTPRequest
 from collections import Counter
 
@@ -7,18 +9,18 @@ stats = Counter()
 
 def process_packet(packet):
     # Bandwidth Stats
-    if packet.haslayer(scapy.IP):
-        ip_layer = packet.getlayer(scapy.IP)
+    if packet.haslayer(IP):
+        ip_layer = packet.getlayer(IP)
         stats[ip_layer.src] += len(packet)
 
     # ARP Spoofing Detection
-    if packet.haslayer(scapy.ARP) and packet.getlayer(scapy.ARP).op == 2:
+    if packet.haslayer(ARP) and packet.getlayer(ARP).op == 2:
         try:
             # Check the real MAC of the sender
-            real_mac = scapy.getmacbyip(packet.getlayer(scapy.ARP).psrc)
-            response_mac = packet.getlayer(scapy.ARP).hwsrc
+            real_mac = getmacbyip(packet.getlayer(ARP).psrc)
+            response_mac = packet.getlayer(ARP).hwsrc
             if real_mac != response_mac:
-                print(f"[!] SECURITY ALERT: Possible ARP Spoofing from {packet.getlayer(scapy.ARP).psrc}")
+                print(f"[!] SECURITY ALERT: Possible ARP Spoofing from {packet.getlayer(ARP).psrc}")
         except:
             pass # Handle cases where lookup fails
 
