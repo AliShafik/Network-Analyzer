@@ -1,7 +1,6 @@
 import scapy.all as scapy
 from scapy.layers.http import HTTPRequest
 from collections import Counter
-import time
 
 # Dictionary to track bandwidth (Bytes per IP)
 stats = Counter()
@@ -39,7 +38,7 @@ def print_stats():
     print("-----------------------------\n")
 
 def main():
-    print("Sniffer active... Press Ctrl+C to stop.")
+    print("Sniffer active...")
     try:
         # Filter captures only IP-based traffic to save CPU
         scapy.sniff(iface=None, store=False, prn=process_packet, filter="ip or arp")
